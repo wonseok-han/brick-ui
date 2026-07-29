@@ -21,7 +21,8 @@
   "rules": {
     "typescript/consistent-type-imports": "error",
     "typescript/no-explicit-any": "warn",
-    "import/no-default-export": "error"
+    "import/no-default-export": "error",
+    "react/react-in-jsx-scope": "off"
   },
   "overrides": [
     {

@@ -82,7 +82,3 @@ brick-ui/
 ```
 
 설계 근거와 의사결정 기록은 [`docs/architecture.md`](./docs/architecture.md)에 있습니다. 패키지를 추가하거나 빌드 설정을 건드리기 전에 읽어보시길 권합니다.
-
-## 라이선스
-
-[MIT](./LICENSE)
