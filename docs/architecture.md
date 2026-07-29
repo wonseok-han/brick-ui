@@ -446,11 +446,41 @@ Changesets의 `linked`로 `@brick/*`를 묶어 major/minor를 같이 올립니�
 ```jsonc
 // .changeset/config.json
 {
-  "linked": [["@brick/*"]],
+  "changelog": "@changesets/cli/changelog",
   "access": "public",
-  "ignore": ["storybook", "docs"],
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "linked": [["@brick/*"]],
+  "ignore": [],
 }
 ```
+
+`linked` 는 **글롭이어야 합니다.** 패키지 이름을 나열하면 명시적이라 좋아 보이지만, changesets 는 목록의 모든 이름이 실제로 존재하는지 검증하므로 **아직 만들지 않은 패키지를 적어두면 설정 자체가 로드되지 않습니다.** `@brick/icons` 를 미리 적었다가 `changeset status` 가 통째로 실패했습니다.
+
+`ignore` 가 비어 있어도 됩니다. `tooling/*` 와 `apps/*` 는 `private: true` 이므로 changesets 가 자동으로 제외합니다.
+
+`fixed` 가 아니라 `linked` 인 이유는, 변경되지 않은 패키지까지 매번 새 버전을 내보내지 않기 위해서입니다. `linked` 는 버전 번호만 맞추고 실제 릴리스는 변경된 패키지만 합니다.
+
+### CI 파이프라인
+
+`.github/workflows/ci.yml` — push/PR 마다 `format:check` → `lint` → `typecheck` → `build` → **`verify:dist`** → Storybook 빌드.
+
+`verify:dist`(`scripts/verify-dist.mjs`)가 이 파이프라인의 핵심입니다. 이 저장소는 **빌드가 성공하면서 CSS 만 사라지는 실패를 두 번** 겪었습니다. 그래서 빌드 성공을 통과 기준으로 삼지 않고, `dist` 안에 기대한 내용이 실제로 있는지 검사합니다.
+
+검사 항목:
+
+- 엔트리 파일(`index.js` / `index.cjs` / `index.d.ts`)과 CSS 파일의 존재 및 최소 크기
+- `theme.css` 의 시맨틱 토큰과 `[data-theme` 다크 블록, CSS 변수 60개 이상
+- `styles.css` 의 토큰 참조 · truncate · lineClamp 스타일
+- `styles.css` 에 **하드코딩된 색상값이 없을 것** (원시 팔레트 직접 사용 방지)
+- `index.js` 가 CSS 를 끌어오지 않을 것 (이름/값 진입점 분리)
+- `dist` 에 `node_modules` 경로 누출이 없을 것 (런타임 의존성 external 처리 확인)
+- `package.json` 의 `exports` 가 가리키는 파일이 실제로 존재할 것
+- 스토리와 타입 테스트가 배포물에 섞이지 않을 것
+
+> 스크립트를 만든 뒤 **일부러 `sideEffects` 를 망가뜨려 실제로 검출되는지 확인했습니다.** 빌드는 에러 없이 성공했고 검증은 5건을 잡아냈습니다. 검증 스크립트도 검증해야 신뢰할 수 있습니다.
+
+`.github/workflows/release.yml` — main 에 changeset 이 쌓이면 "Version Packages" PR 을 열고, 그 PR 이 머지되면 npm 에 배포합니다. **저장소에 `NPM_TOKEN` 시크릿이 등록되어 있어야 동작합니다.**
 
 ---
 

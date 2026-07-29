@@ -64,6 +64,7 @@ pnpm build          # 전체 빌드 (turbo가 패키지 간 순서를 해결)
 pnpm typecheck
 pnpm lint           # oxlint --type-aware
 pnpm format
+pnpm verify:dist    # 배포 산출물에 CSS와 타입이 실제로 들어갔는지 검사
 ```
 
 컴포넌트를 보면서 작업할 때:
@@ -80,6 +81,16 @@ Storybook은 `@brick/*`를 `dist`가 아니라 `src`로 해석합니다. 컴포�
 pnpm --filter @brick/tokens build
 pnpm --filter @brick/tokens dev     # watch 모드
 ```
+
+## 기여
+
+`packages/*`를 변경했다면 changeset을 함께 올려주세요.
+
+```bash
+pnpm changeset
+```
+
+main에 머지되면 GitHub Actions가 "Version Packages" PR을 열고, 그 PR을 머지하면 npm에 배포됩니다. 자세한 내용은 [`.changeset/README.md`](./.changeset/README.md)에 있습니다.
 
 ## 저장소 구조
 

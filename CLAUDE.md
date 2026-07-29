@@ -15,6 +15,8 @@ pnpm build                          # turbo run build
 pnpm typecheck                      # turbo run typecheck
 pnpm lint                           # oxlint --type-aware (turbo 안 거침, 저장소 전체 한 번에)
 pnpm format                         # prettier --write .
+pnpm verify:dist                    # dist 안에 CSS/타입이 실제로 있는지 검사
+pnpm changeset                      # packages/* 변경 시 필수
 pnpm --filter @brick/tokens build   # 단일 패키지
 ```
 

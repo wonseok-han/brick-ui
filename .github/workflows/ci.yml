@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 같은 브랜치에서 새 푸시가 오면 이전 실행을 취소한다.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: 검증
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 포맷 검사
+        run: pnpm format:check
+
+      - name: 린트
+        run: pnpm lint
+
+      - name: 타입 검사
+        run: pnpm typecheck
+
+      - name: 빌드
+        run: pnpm build
+
+      # 빌드 성공은 통과 기준이 아니다. sideEffects 설정이 틀어지면 빌드는
+      # 성공하면서 CSS 만 조용히 사라진다. dist 안을 직접 확인한다.
+      - name: 배포 산출물 검증
+        run: pnpm verify:dist
+
+      - name: Storybook 빌드
+        run: pnpm --filter @brick/storybook build-storybook

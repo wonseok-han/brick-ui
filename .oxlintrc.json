@@ -44,6 +44,12 @@
       }
     },
     {
+      "files": ["scripts/**/*.mjs"],
+      "rules": {
+        "no-await-in-loop": "off"
+      }
+    },
+    {
       "files": ["**/*.stories.tsx"],
       "rules": {
         "react-perf/jsx-no-new-object-as-prop": "off",

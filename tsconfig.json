@@ -5,6 +5,6 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["*.ts", "*.mjs", "tooling/**/*.mjs", "tooling/**/*.d.ts"],
+  "include": ["*.ts", "*.mjs", "tooling/**/*.mjs", "tooling/**/*.d.ts", "scripts/**/*.mjs"],
   "exclude": ["node_modules", "**/dist", "apps", "packages"]
 }

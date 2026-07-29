@@ -22,9 +22,14 @@
     "lint:fix": "oxlint --type-aware --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "verify:dist": "node scripts/verify-dist.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "turbo run build --filter='./packages/*' && pnpm verify:dist && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "oxlint": "^1.76.0",
     "oxlint-tsgolint": "^7.0.2001",
     "prettier": "^3.9.6",
