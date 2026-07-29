@@ -17,15 +17,32 @@ const entries = Object.entries(icons) as [string, (typeof icons)["CheckIcon"]][]
 
 export const AllIcons: Story = {
   render: () => (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+        gap: 24,
+      }}
+    >
       {entries.map(([name, Icon]) => (
         <div key={name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Icon />
+          <Icon style={{ flexShrink: 0 }} />
           <code style={{ fontSize: 13 }}>{name}</code>
         </div>
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<>
+  <CheckIcon />
+  <InfoIcon />
+  <WarningIcon />
+</>`,
+      },
+    },
+  },
 };
 
 /** `size` 하나로 가로·세로가 함께 정해집니다. */
@@ -40,6 +57,19 @@ export const Sizes: Story = {
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+  <CheckIcon size={16} />
+  <CheckIcon size={20} />
+  <CheckIcon size={24} />
+  <CheckIcon size={32} />
+  <CheckIcon size={48} />
+</div>`,
+      },
+    },
+  },
 };
 
 /**
@@ -62,4 +92,14 @@ export const InheritsColor: Story = {
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ color: "var(--brick-color-danger-fg)", display: "flex", gap: 8 }}>
+  <WarningIcon size={20} />
+  <span>아이콘은 부모의 currentColor를 상속합니다.</span>
+</div>`,
+      },
+    },
+  },
 };

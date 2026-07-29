@@ -31,6 +31,22 @@ export const Sizes: Story = {
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+  <Text size="xs">xs — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="sm">sm — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="md">md — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="lg">lg — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="xl">xl — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="2xl">2xl — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="3xl">3xl — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="4xl">4xl — 다람쥐 헌 쳇바퀴에 타고파</Text>
+</div>`,
+      },
+    },
+  },
 };
 
 export const Weights: Story = {
@@ -43,6 +59,18 @@ export const Weights: Story = {
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+  <Text size="lg" weight="regular">regular — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="lg" weight="medium">medium — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="lg" weight="semibold">semibold — 다람쥐 헌 쳇바퀴에 타고파</Text>
+  <Text size="lg" weight="bold">bold — 다람쥐 헌 쳇바퀴에 타고파</Text>
+</div>`,
+      },
+    },
+  },
 };
 
 export const Tones: Story = {
@@ -57,6 +85,21 @@ export const Tones: Story = {
       )}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+  <Text tone="neutral">neutral — 이 색상은 토큰에서 옵니다</Text>
+  <Text tone="subtle">subtle — 이 색상은 토큰에서 옵니다</Text>
+  <Text tone="muted">muted — 이 색상은 토큰에서 옵니다</Text>
+  <Text tone="brand">brand — 이 색상은 토큰에서 옵니다</Text>
+  <Text tone="danger">danger — 이 색상은 토큰에서 옵니다</Text>
+  <Text tone="success">success — 이 색상은 토큰에서 옵니다</Text>
+  <Text tone="warning">warning — 이 색상은 토큰에서 옵니다</Text>
+</div>`,
+      },
+    },
+  },
 };
 
 /** 이 라이브러리가 존재하는 이유. 한 줄 말줄임이 기본 제공됩니다. */
@@ -69,6 +112,17 @@ export const Truncate: Story = {
       </Text>
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ width: 320 }}>
+  <Text truncate>
+    컨테이너를 넘어가는 아주 긴 텍스트입니다. truncate 하나로 한 줄 말줄임을 적용합니다.
+  </Text>
+</div>`,
+      },
+    },
+  },
 };
 
 /** 여러 줄 말줄임. `truncate` 와 동시에 쓰지 않습니다. */
@@ -86,6 +140,17 @@ export const LineClamp: Story = {
       ))}
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<div style={{ width: 320 }}>
+  <Text lineClamp={2}>
+    이 문단은 두 줄을 넘어가는 부분부터 말줄임으로 처리됩니다.
+  </Text>
+</div>`,
+      },
+    },
+  },
 };
 
 /** `as` 로 렌더링할 태그를 바꿔도 타입이 따라옵니다. */
@@ -103,4 +168,21 @@ export const PolymorphicAs: Story = {
       </Text>
     </div>
   ),
+  parameters: {
+    docs: {
+      source: {
+        code: `<>
+  <Text as="h1" size="3xl" weight="bold">
+    h1 으로 렌더링
+  </Text>
+  <Text as="span" tone="muted">
+    span 으로 렌더링
+  </Text>
+  <Text as="a" href="https://seed-design.io" target="_blank" tone="brand">
+    a 로 렌더링 — href 가 타입상 유효합니다
+  </Text>
+</>`,
+      },
+    },
+  },
 };
