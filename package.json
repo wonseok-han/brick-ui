@@ -4,6 +4,12 @@
   "private": true,
   "type": "module",
   "description": "Primitive 컴포넌트 중심의 디자인 시스템",
+  "license": "MIT",
+  "author": "wonseok-han",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wonseok-han/brick-ui.git"
+  },
   "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=22"

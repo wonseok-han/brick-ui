@@ -2,6 +2,15 @@
   "name": "@brick/tokens",
   "version": "0.0.0",
   "description": "brick-ui 디자인 토큰 및 테마 계약",
+  "license": "MIT",
+  "author": "wonseok-han",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wonseok-han/brick-ui.git",
+    "directory": "packages/tokens"
+  },
+  "homepage": "https://github.com/wonseok-han/brick-ui#readme",
+  "bugs": "https://github.com/wonseok-han/brick-ui/issues",
   "type": "module",
   "sideEffects": [
     "**/*.css",
