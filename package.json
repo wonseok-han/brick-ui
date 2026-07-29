@@ -1,0 +1,28 @@
+{
+  "name": "brick-ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Primitive 컴포넌트 중심의 디자인 시스템",
+  "packageManager": "pnpm@11.17.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "typecheck": "turbo run typecheck",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "oxlint": "^1.76.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "prettier": "^3.9.6",
+    "turbo": "^2.10.7",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@brick/vite-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "*.mjs",
+    "*.d.ts"
+  ],
+  "exports": {
+    "./library": {
+      "types": "./library.d.ts",
+      "default": "./library.mjs"
+    }
+  },
+  "dependencies": {
+    "@vanilla-extract/vite-plugin": "catalog:",
+    "rollup-plugin-preserve-directives": "^0.4.0"
+  },
+  "peerDependencies": {
+    "vite": "catalog:"
+  }
+}

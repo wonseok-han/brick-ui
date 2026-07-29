@@ -1,0 +1,13 @@
+{
+  "name": "@brick/typescript-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "*.json"
+  ],
+  "exports": {
+    "./base": "./base.json",
+    "./react-library": "./react-library.json",
+    "./next": "./next.json"
+  }
+}

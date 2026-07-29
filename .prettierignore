@@ -1,0 +1,10 @@
+node_modules
+dist
+.turbo
+.next
+storybook-static
+pnpm-lock.yaml
+*.tgz
+
+# SVGR codegen 산출물 (7단계)
+packages/icons/src/generated

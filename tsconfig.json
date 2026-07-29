@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tooling/typescript-config/base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["*.ts", "*.mjs", "tooling/**/*.mjs", "tooling/**/*.d.ts"],
+  "exclude": ["node_modules", "**/dist", "apps", "packages"]
+}

@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.turbo/
+storybook-static/
+.next/
+out/
+
+*.tsbuildinfo
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# pnpm pack 산출물 (5단계 로컬 소비 검증)
+*.tgz

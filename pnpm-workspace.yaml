@@ -1,0 +1,21 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
+
+# pnpm 11 은 postinstall 스크립트를 기본 차단한다. 빌드가 필요한 것만 허용.
+allowBuilds:
+  esbuild: true
+
+# 모든 패키지가 "catalog:" 로 참조한다. 버전 드리프트 방지의 단일 지점.
+catalog:
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  "@types/react": ^19.2.17
+  "@types/react-dom": ^19.2.3
+  typescript: ^7.0.2
+  vite: ^8.1.5
+  "@vanilla-extract/css": ^1.21.2
+  "@vanilla-extract/sprinkles": ^1.7.0
+  "@vanilla-extract/recipes": ^0.5.7
+  "@vanilla-extract/vite-plugin": ^5.2.6
