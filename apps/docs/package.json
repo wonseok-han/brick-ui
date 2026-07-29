@@ -1,0 +1,29 @@
+{
+  "name": "@brick/docs",
+  "version": "0.0.0",
+  "description": "brick-ui 공개 문서 사이트",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3100",
+    "build": "next build",
+    "start": "next start --port 3100",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@brick/core": "workspace:*",
+    "@brick/icons": "workspace:*",
+    "@brick/tokens": "workspace:*",
+    "next": "^16.2.12",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@brick/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

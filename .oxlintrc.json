@@ -38,7 +38,13 @@
       }
     },
     {
-      "files": ["**/src/theme.ts", "**/src/styles.ts", "**/.storybook/preview.ts"],
+      "files": [
+        "**/src/theme.ts",
+        "**/src/styles.ts",
+        "**/.storybook/preview.ts",
+        "**/app/layout.tsx",
+        "**/next-env.d.ts"
+      ],
       "rules": {
         "import/no-unassigned-import": "off"
       }

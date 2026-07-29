@@ -195,8 +195,33 @@ stories: ["../../../packages/*/src/**/*.stories.@(ts|tsx)"];
 
 `src/svg/*.svg` → SVGR codegen → `src/generated/*.tsx`.
 
-- codegen 산출물은 gitignore하지 말고 **커밋하는 편이 CI·리뷰 모두 편합니다.**
-- 트리셰이킹을 위해 `preserveModules` 빌드가 필수입니다.
+**SVG 소스는 직접 작성합니다.** 외부 아이콘 세트를 가져오면 라이선스가 얽히고, 배포 패키지에 그 조건이 따라붙습니다.
+
+**codegen 산출물은 커밋합니다.** gitignore하면 리뷰에서 아이콘 변경을 볼 수 없고, CI가 codegen을 먼저 돌려야 빌드되는 순서 의존이 생깁니다. 대신 `generate:check`를 CI에 넣어 SVG만 고치고 codegen을 빼먹는 것을 막습니다.
+
+#### API 설계 두 가지
+
+**색상 prop을 두지 않습니다.** SVG 내부가 전부 `currentColor`라 CSS의 `color`를 그대로 따라갑니다. `<Text tone="danger">` 안에 넣으면 아이콘도 같이 붉어지고, 다크 테마 전환도 공짜로 따라옵니다. 색상 prop을 만들면 이 상속이 끊깁니다.
+
+**`width`/`height` 대신 `size` 하나만 받습니다.** 아이콘은 정사각형이므로 둘을 따로 받으면 찌그러진 결과만 만들 수 있습니다.
+
+이를 위해 SVGR 기본 템플릿 대신 커스텀 템플릿을 씁니다. 기본 템플릿은 `SVGProps<SVGSVGElement>`를 그대로 받아서, size 처리를 아이콘마다 반복해야 합니다.
+
+#### 걸리는 것
+
+**SVGO의 `removeViewBox`를 꺼야 합니다.** 기본값이 `viewBox` 제거인데, 그러면 `size`를 바꿔도 스케일되지 않습니다. `verify-dist`에 `viewBox`와 `currentColor` 존재 검사를 넣어 회귀를 막습니다.
+
+**트리셰이킹을 위해 `preserveModules` 빌드가 필수입니다.** 한 파일로 뭉치면 아이콘 하나 쓰는데 전체가 딸려갑니다.
+
+### `apps/docs` — 첫 번째 소비자
+
+Next.js 16 App Router, 포트 3100 (3000~3006은 다른 프로젝트가 점유).
+
+**`transpilePackages`로 소스를 끌어오지 않습니다.** 빌드된 `dist`를 그대로 소비합니다. 그래야 소비자가 겪을 문제(`exports` 맵, RSC 경계, CSS 누락)를 저장소 안에서 상시로 밟게 됩니다. `apps/storybook`이 `src`를 보는 것과 의도적으로 반대입니다.
+
+빌드 결과 페이지가 `○ Static`으로 프리렌더됩니다. `Text`와 아이콘에 `"use client"`가 없어도 렌더링된다는 뜻이고, "Primitive는 서버 컴포넌트로 둔다"는 설계가 실제로 성립한다는 증거입니다.
+
+> **`experimental.useTypeScriptCli`가 필요합니다.** Next는 기본적으로 TypeScript 컴파일러 API로 타입 검사를 돌리는데, TS7이 그 API를 제거해서 `next build`가 실패합니다. 이 옵션을 켜면 API 대신 `tsc` CLI를 호출합니다. `typescript-eslint`·`vite-plugin-dts`를 교체한 것과 같은 계열의 제약입니다.
 
 ### `tooling/*`
 

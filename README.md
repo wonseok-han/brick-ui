@@ -13,7 +13,7 @@ HTML의 기본 태그를 **유틸리티 CSS가 온전히 적용된 상태로 래
 | `@brick/tokens` | CSS 변수 계약과 라이트/다크 테마    | ✅ 구현됨  |
 | `@brick/utils`  | polymorphic 타입, `cx`, `mergeRefs` | ✅ 구현됨  |
 | `@brick/core`   | Primitive 컴포넌트 (`Text`)         | 🚧 진행 중 |
-| `@brick/icons`  | SVG → React 컴포넌트                | ⬜ 예정    |
+| `@brick/icons`  | SVG → React 컴포넌트 (8종)          | ✅ 구현됨  |
 
 ## 기술 스택
 
@@ -21,7 +21,7 @@ HTML의 기본 태그를 **유틸리티 CSS가 온전히 적용된 상태로 래
 - **React 19** + **TypeScript 7**
 - **Vanilla Extract** — 제로 런타임 CSS. 소비 프로젝트의 빌드 설정에 의존하지 않습니다
 - **oxlint** + **Prettier**
-- **Storybook 10** (컴포넌트 개발) / **Next.js** (공개 문서) — 문서 사이트는 예정
+- **Storybook 10** (컴포넌트 개발) / **Next.js 16** (공개 문서)
 
 TypeScript 7이 클래식 컴파일러 API를 제거해 `typescript-eslint`와 `vite-plugin-dts`를 쓸 수 없습니다. 각각 `oxlint`와 `tsc --emitDeclarationOnly`로 대체했습니다. 자세한 내용은 [아키텍처 문서](./docs/architecture.md#typescript-7이-툴체인에-강제하는-제약)를 참고하세요.
 
@@ -71,9 +71,13 @@ pnpm verify:dist    # 배포 산출물에 CSS와 타입이 실제로 들어갔�
 
 ```bash
 pnpm --filter @brick/storybook dev   # http://localhost:6006
+pnpm --filter @brick/docs dev        # http://localhost:3100
 ```
 
-Storybook은 `@brick/*`를 `dist`가 아니라 `src`로 해석합니다. 컴포넌트와 `.css.ts`를 고치면 즉시 반영되고, 패키지를 다시 빌드할 필요가 없습니다.
+두 앱의 역할이 다릅니다.
+
+- **Storybook**은 `@brick/*`를 `dist`가 아니라 **`src`로 해석**합니다. 컴포넌트와 `.css.ts`를 고치면 즉시 반영되고 패키지를 다시 빌드할 필요가 없습니다. 개발용입니다.
+- **docs**는 빌드된 **`dist`를 그대로 소비**합니다. 소비자가 겪을 문제(`exports` 맵, RSC 경계, CSS 누락)를 저장소 안에서 상시로 밟게 하는 역할을 겸합니다.
 
 특정 패키지만 작업할 때:
 
@@ -96,7 +100,7 @@ main에 머지되면 GitHub Actions가 "Version Packages" PR을 엽니다. 그 P
 
 ```
 brick-ui/
-├─ apps/            # storybook (docs 는 예정)
+├─ apps/            # storybook, docs
 ├─ packages/        # 배포 대상 — tokens, utils, core, icons
 ├─ tooling/         # 내부 전용 — typescript-config, vite-config
 └─ docs/            # 설계 문서

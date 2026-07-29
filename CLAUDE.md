@@ -58,6 +58,9 @@ TypeScript 7은 npm 패키지 `exports`에서 클래식 컴파일러 API를 제�
 ## 로컬 환경
 
 - **포트 3000~3006은 다른 프로젝트가 점유 중입니다.** `apps/docs`는 3100, `apps/storybook`은 6006을 씁니다
+- **`apps/storybook`(6006)은 `src`를, `apps/docs`(3100)는 `dist`를 소비합니다.** 의도된 차이입니다 — Storybook은 HMR을 위해, docs는 배포 산출물을 상시 검증하기 위해서입니다
+- **아이콘 SVG를 고쳤으면 `pnpm --filter @brick/icons generate`를 돌리고 산출물을 커밋하세요.** CI가 `generate:check`로 막습니다
+- **Next.js는 `experimental.useTypeScriptCli`가 필요합니다.** TypeScript 7이 클래식 컴파일러 API를 제거해서, 이 옵션이 없으면 `next build`가 타입 검사 단계에서 실패합니다
 - **컴포넌트를 눈으로 확인할 때는 Chrome 헤드리스로 Storybook iframe 을 직접 캡처하세요.** Claude 브라우저 확장은 Chrome 로그인 계정이 다르면 연결되지 않습니다. 설치 없이 되고 더 안정적입니다:
 
   ```bash

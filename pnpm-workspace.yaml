@@ -6,6 +6,8 @@ packages:
 # pnpm 11 은 postinstall 스크립트를 기본 차단한다. 빌드가 필요한 것만 허용.
 allowBuilds:
   esbuild: true
+  # Next.js 의 이미지 최적화가 쓰는 네이티브 바이너리. apps/docs 가 필요로 한다.
+  sharp: true
 
 # 모든 패키지가 "catalog:" 로 참조한다. 버전 드리프트 방지의 단일 지점.
 catalog:

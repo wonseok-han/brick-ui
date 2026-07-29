@@ -50,5 +50,6 @@ jobs:
       - name: 배포 산출물 검증
         run: pnpm verify:dist
 
+      # apps/docs 는 빌드된 dist 를 소비한다. 여기서 깨지면 소비자도 깨진다.
       - name: Storybook 빌드
         run: pnpm --filter @brick/storybook build-storybook
