@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Primitive 컴포넌트 중심의 디자인 시스템",
+  "description": "HTML 기본 태그를 유틸리티 CSS가 적용된 상태로 래핑한 React Primitive 컴포넌트 디자인 시스템",
   "license": "MIT",
   "author": "wonseok-han",
   "repository": {

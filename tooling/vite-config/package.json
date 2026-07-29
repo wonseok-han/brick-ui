@@ -1,6 +1,7 @@
 {
   "name": "@brick/vite-config",
   "version": "0.0.0",
+  "description": "brick-ui 배포 패키지용 Vite 라이브러리 빌드 프리셋 (Vanilla Extract, preserveModules, external 자동 추출)",
   "private": true,
   "type": "module",
   "files": [

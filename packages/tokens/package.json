@@ -1,7 +1,7 @@
 {
   "name": "@brick/tokens",
   "version": "0.0.0",
-  "description": "brick-ui 디자인 토큰 및 테마 계약",
+  "description": "brick-ui 디자인 토큰 — CSS 변수 계약과 라이트/다크 테마",
   "license": "MIT",
   "author": "wonseok-han",
   "repository": {
