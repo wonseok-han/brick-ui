@@ -15,6 +15,7 @@ const repoRoot = resolve(import.meta.dirname, "../../..");
  */
 const BRICK_ALIAS_ENTRIES: [find: string, replacement: string][] = [
   ["@brick/core", resolve(repoRoot, "packages/core/src")],
+  ["@brick/icons", resolve(repoRoot, "packages/icons/src")],
   ["@brick/tokens", resolve(repoRoot, "packages/tokens/src")],
   ["@brick/utils", resolve(repoRoot, "packages/utils/src")],
 ];

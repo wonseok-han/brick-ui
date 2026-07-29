@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@brick/core": "workspace:*",
+    "@brick/icons": "workspace:*",
     "@brick/tokens": "workspace:*",
     "@brick/utils": "workspace:*",
     "react": "catalog:",

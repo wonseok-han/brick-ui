@@ -31,6 +31,11 @@ jobs:
       - name: 포맷 검사
         run: pnpm format:check
 
+      # 아이콘 산출물은 커밋한다. SVG 만 고치고 codegen 을 안 돌린 채
+      # 올라가는 것을 막는다.
+      - name: 아이콘 산출물 최신 여부
+        run: pnpm --filter @brick/icons generate:check
+
       - name: 린트
         run: pnpm lint
 

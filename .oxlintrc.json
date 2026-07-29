@@ -44,7 +44,7 @@
       }
     },
     {
-      "files": ["scripts/**/*.mjs"],
+      "files": ["**/scripts/**/*.mjs"],
       "rules": {
         "no-await-in-loop": "off"
       }

@@ -51,6 +51,22 @@ const targets = [
     ],
   },
   {
+    name: "@brick/icons",
+    dir: "packages/icons",
+    checks: [
+      file("dist/index.js"),
+      file("dist/index.cjs"),
+      file("dist/index.d.ts"),
+      // 아이콘마다 파일이 분리돼야 소비 측에서 쓰는 것만 가져간다.
+      // 한 파일로 뭉치면 아이콘 하나 쓰는데 전체가 딸려간다.
+      file("dist/generated/CheckIcon.js"),
+      // 색상은 CSS 의 color 를 따라가야 한다. 하드코딩되면 테마가 안 먹는다.
+      contains("dist/generated/CheckIcon.js", "currentColor", "currentColor"),
+      // viewBox 가 없으면 size 를 바꿔도 스케일되지 않는다.
+      contains("dist/generated/CheckIcon.js", "viewBox", "viewBox"),
+    ],
+  },
+  {
     name: "@brick/core",
     dir: "packages/core",
     checks: [
