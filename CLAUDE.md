@@ -29,7 +29,12 @@ TypeScript 7은 npm 패키지 `exports`에서 클래식 컴파일러 API를 제�
 
 ## 빌드 파이프라인의 함정
 
-**`sideEffects`에 `**/*.css.ts`를 반드시 포함하세요.** Vite의 resolve 플러그인은 이 글롭을 자기 패키지 소스에도 적용합니다. `**/*.css`만 적으면 `src/**/*.css.ts`가 "부수효과 없는 모듈"로 판정돼 트리셰이킹으로 제거됩니다. **빌드는 성공하고 CSS 파일만 조용히 사라집니다.**
+**`sideEffects`에 `**/*.css.ts`와 부수효과 엔트리(`theme.ts` / `styles.ts`)를 반드시 포함하세요.** Vite의 resolve 플러그인은 이 글롭을 자기 패키지 소스에도 적용합니다. 빠진 파일은 "부수효과 없는 모듈"로 판정돼 트리셰이킹으로 제거되고, **빌드는 성공하면서 CSS만 조용히 사라집니다.**
+
+- `**/*.css` 만 적으면 → `src/themes/light.css.ts` 누락 (2단계에서 발생)
+- `**/*.css.ts` 까지만 적으면 → `theme.ts` / `styles.ts` 가 누락. 우리 패키지 빌드에서는 엔트리라 살아남지만 Storybook처럼 import 하는 쪽에서 제거됨 (4단계에서 발생)
+
+**VE 패키지는 전부 제로 런타임이 아닙니다.** `@vanilla-extract/css`만 `devDependencies`이고, `recipes` / `sprinkles` / `dynamic`은 런타임 코드를 포함하므로 **`dependencies`** 여야 합니다. 잘못 두면 `dist/node_modules/.pnpm/...` 경로가 산출물에 박힙니다.
 
 **빌드 성공을 통과 기준으로 삼지 마세요.** `dist`에 CSS가 실제로 있는지, 그 안에 기대한 변수/클래스가 들어 있는지 직접 확인해야 합니다.
 

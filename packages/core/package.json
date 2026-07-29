@@ -1,13 +1,13 @@
 {
-  "name": "@brick/tokens",
+  "name": "@brick/core",
   "version": "0.0.0",
-  "description": "brick-ui 디자인 토큰 — CSS 변수 계약과 라이트/다크 테마",
+  "description": "brick-ui Primitive 컴포넌트 — 유틸리티 CSS가 적용된 HTML 기본 태그 래퍼",
   "license": "MIT",
   "author": "wonseok-han",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wonseok-han/brick-ui.git",
-    "directory": "packages/tokens"
+    "directory": "packages/core"
   },
   "homepage": "https://github.com/wonseok-han/brick-ui#readme",
   "bugs": "https://github.com/wonseok-han/brick-ui/issues",
@@ -15,9 +15,9 @@
   "sideEffects": [
     "**/*.css",
     "**/*.css.ts",
-    "**/theme.ts",
-    "**/theme.js",
-    "**/theme.cjs"
+    "**/styles.ts",
+    "**/styles.js",
+    "**/styles.cjs"
   ],
   "files": [
     "dist"
@@ -28,7 +28,7 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./theme.css": "./dist/theme.css",
+    "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
   "publishConfig": {
@@ -41,10 +41,23 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
+  "dependencies": {
+    "@brick/tokens": "workspace:^",
+    "@brick/utils": "workspace:^",
+    "@vanilla-extract/recipes": "^0.5.7",
+    "@vanilla-extract/sprinkles": "catalog:"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
   "devDependencies": {
     "@brick/typescript-config": "workspace:*",
     "@brick/vite-config": "workspace:*",
+    "@types/react": "catalog:",
+    "@storybook/react-vite": "catalog:",
     "@vanilla-extract/css": "catalog:",
+    "react": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

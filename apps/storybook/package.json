@@ -1,0 +1,33 @@
+{
+  "name": "@brick/storybook",
+  "version": "0.0.0",
+  "description": "brick-ui 컴포넌트 개발·검증 환경",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf storybook-static .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@brick/core": "workspace:*",
+    "@brick/tokens": "workspace:*",
+    "@brick/utils": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@brick/typescript-config": "workspace:*",
+    "@storybook/addon-a11y": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/react-vite": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/node": "catalog:",
+    "@vanilla-extract/vite-plugin": "catalog:",
+    "storybook": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

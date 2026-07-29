@@ -325,11 +325,16 @@ pnpm catalog로 React/TS 버전을 한 곳에서 고정하면, 패키지가 10�
 
 #### 짚어둘 4가지
 
-**① `@vanilla-extract/css`는 `devDependencies`**
+**① VE 패키지마다 `dependencies` / `devDependencies` 가 갈립니다**
 
-제로 런타임이라 빌드 후 산출물에는 클래스명 문자열만 남습니다. 소비자가 VE를 설치할 필요가 없다는 게 이 스택의 최대 장점입니다.
+| 패키지                       | 위치               | 이유                                               |
+| ---------------------------- | ------------------ | -------------------------------------------------- |
+| `@vanilla-extract/css`       | `devDependencies`  | 진짜 제로 런타임. 빌드 후 클래스명 문자열만 남는다 |
+| `@vanilla-extract/recipes`   | **`dependencies`** | `recipe()` 가 `createRuntimeFn` 을 반환한다        |
+| `@vanilla-extract/sprinkles` | **`dependencies`** | `sprinkles()` 자체가 런타임 함수다                 |
+| `@vanilla-extract/dynamic`   | **`dependencies`** | `assignInlineVars` 는 런타임 호출                  |
 
-> 단, `assignInlineVars`(동적 스타일)를 쓰면 `@vanilla-extract/dynamic`은 **진짜 `dependencies`** 여야 합니다.
+"Vanilla Extract = 제로 런타임"은 `@vanilla-extract/css` 에만 해당합니다. recipes 와 sprinkles 는 작지만 실제 런타임 코드를 포함하며, 이걸 `devDependencies` 로 두면 번들에 인라인되면서 **`dist/node_modules/.pnpm/@vanilla-extract_sprinkles@1.7.0_.../...` 같은 경로가 산출물에 그대로 박힙니다.** `dependencies` 로 옮기면 external 처리되어 사라집니다.
 
 **② `sideEffects: ["**/*.css"]`**
 
@@ -338,6 +343,17 @@ pnpm catalog로 React/TS 버전을 한 곳에서 고정하면, 패키지가 10�
 `**/*.css.ts`가 왜 같이 필요한지는 실제로 당해봐야 압니다. Vite의 resolve 플러그인은 이 글롭을 **소비자뿐 아니라 자기 패키지 소스에도 적용**합니다. `**/*.css`만 적으면 `src/themes/light.css.ts`가 매치되지 않아 "부수효과 없는 모듈"로 판정되고, `import "./themes/light.css"` 같은 부수효과 전용 import가 트리셰이킹으로 제거됩니다.
 
 결과는 조용한 실패입니다 — 빌드는 성공하고, 산출 JS는 멀쩡하고, **CSS 파일만 생성되지 않습니다.** 에러도 경고도 없습니다. 2단계에서 `dist/theme.css`가 통째로 누락된 원인이 이것이었습니다.
+
+**부수효과 엔트리 자체도 목록에 넣어야 합니다.** `theme.ts` / `styles.ts` 는 확장자가 `.css.ts` 가 아니므로 위 글롭에 걸리지 않습니다. 우리 패키지를 빌드할 때는 이들이 *엔트리 포인트*라 트리셰이킹 대상이 아니어서 문제가 드러나지 않지만, **Storybook처럼 이들을 그냥 import 하는 쪽에서는 통째로 제거됩니다.**
+
+```jsonc
+// @brick/tokens
+"sideEffects": ["**/*.css", "**/*.css.ts", "**/theme.ts", "**/theme.js", "**/theme.cjs"]
+// @brick/core
+"sideEffects": ["**/*.css", "**/*.css.ts", "**/styles.ts", "**/styles.js", "**/styles.cjs"]
+```
+
+4단계에서 Storybook 화면에 컴포넌트 CSS는 나오는데 토큰 변수만 0개인 상태로 나타났습니다. 증상이 2단계와 같고 원인 위치만 달랐습니다.
 
 > 빌드 성공을 통과 기준으로 삼으면 안 됩니다. `dist` 안에 CSS가 실제로 있는지, 그 안에 기대한 변수가 들어 있는지까지 확인해야 합니다.
 
