@@ -1,0 +1,45 @@
+name: Version
+
+# main 에 changeset 이 쌓이면 "Version Packages" PR 을 열거나 갱신한다.
+# 이 워크플로는 절대 npm 에 발행하지 않는다 — 발행은 release.yml 이 태그로만 한다.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: version
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version:
+    name: 버전 PR 생성/갱신
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # changesets 가 변경 이력을 읽어야 하므로 전체 히스토리가 필요하다.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # publish 입력을 주지 않는다. 주면 changeset 이 없을 때 곧바로 발행을
+      # 시도한다. 발행 트리거는 태그 하나로 통일한다.
+      - uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          commit: "chore: 패키지 버전 갱신"
+          title: "chore: 패키지 버전 갱신"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

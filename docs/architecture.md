@@ -28,7 +28,7 @@
 | 타입 선언 생성      | **`tsc --emitDeclarationOnly`**           | 동일 이유로 vite-plugin-dts 계열 사용 불가                                                                         |
 | 문서                | Storybook(개발) + Next.js(공개 문서) 병행 | 컴포넌트 격리 개발 환경과 공개 문서를 분리                                                                         |
 | 패키지 분할         | core / tokens / icons / utils             | 각 경계를 초기부터 명확히                                                                                          |
-| 릴리스              | Changesets                                | `@brick/*` linked 버전 관리                                                                                        |
+| 릴리스              | Changesets(버전) + 태그 트리거(배포)      | `@brick/*` fixed 버전. npm Trusted Publishing(OIDC), NPM_TOKEN 불필요                                              |
 
 ### TypeScript 7이 툴체인에 강제하는 제약
 
@@ -441,7 +441,7 @@ import "@brick/core/styles.css";
 
 ### 버전 정책
 
-Changesets의 `linked`로 `@brick/*`를 묶어 major/minor를 같이 올립니다. 소비자가 "@brick 계열은 버전 맞춰 쓰면 된다"고 이해할 수 있어야 합니다.
+Changesets의 `fixed`로 `@brick/*`를 묶어 **항상 같은 버전**을 유지합니다.
 
 ```jsonc
 // .changeset/config.json
@@ -450,16 +450,17 @@ Changesets의 `linked`로 `@brick/*`를 묶어 major/minor를 같이 올립니�
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "linked": [["@brick/*"]],
+  "fixed": [["@brick/*"]],
+  "linked": [],
   "ignore": [],
 }
 ```
 
-`linked` 는 **글롭이어야 합니다.** 패키지 이름을 나열하면 명시적이라 좋아 보이지만, changesets 는 목록의 모든 이름이 실제로 존재하는지 검증하므로 **아직 만들지 않은 패키지를 적어두면 설정 자체가 로드되지 않습니다.** `@brick/icons` 를 미리 적었다가 `changeset status` 가 통째로 실패했습니다.
+**`linked` 가 아니라 `fixed` 인 이유**는 릴리스 트리거가 태그이기 때문입니다. `v0.2.0` 태그 하나가 모든 `@brick/*` 를 가리켜야 "태그 = 배포 버전"이 성립합니다. `linked` 는 변경된 패키지만 올려서 버전이 갈라지고, 그러면 태그가 무엇을 뜻하는지 모호해집니다. 변경되지 않은 패키지도 같이 올라가는 비용을 치르는 대신, 소비자 입장도 단순해집니다 — `@brick/*` 는 전부 같은 버전을 쓰면 됩니다.
+
+**글롭이어야 합니다.** 패키지 이름을 나열하면 명시적이라 좋아 보이지만, changesets 는 목록의 모든 이름이 실제로 존재하는지 검증하므로 **아직 만들지 않은 패키지를 적어두면 설정 자체가 로드되지 않습니다.** `@brick/icons` 를 미리 적었다가 `changeset status` 가 통째로 실패했습니다.
 
 `ignore` 가 비어 있어도 됩니다. `tooling/*` 와 `apps/*` 는 `private: true` 이므로 changesets 가 자동으로 제외합니다.
-
-`fixed` 가 아니라 `linked` 인 이유는, 변경되지 않은 패키지까지 매번 새 버전을 내보내지 않기 위해서입니다. `linked` 는 버전 번호만 맞추고 실제 릴리스는 변경된 패키지만 합니다.
 
 ### CI 파이프라인
 
@@ -480,7 +481,50 @@ Changesets의 `linked`로 `@brick/*`를 묶어 major/minor를 같이 올립니�
 
 > 스크립트를 만든 뒤 **일부러 `sideEffects` 를 망가뜨려 실제로 검출되는지 확인했습니다.** 빌드는 에러 없이 성공했고 검증은 5건을 잡아냈습니다. 검증 스크립트도 검증해야 신뢰할 수 있습니다.
 
-`.github/workflows/release.yml` — main 에 changeset 이 쌓이면 "Version Packages" PR 을 열고, 그 PR 이 머지되면 npm 에 배포합니다. **저장소에 `NPM_TOKEN` 시크릿이 등록되어 있어야 동작합니다.**
+### 배포 파이프라인
+
+**배포 트리거는 태그 하나뿐입니다.** main 에 푸시하는 것만으로는 npm 에 아무것도 올라가지 않습니다.
+
+```
+PR(+changeset) 머지
+   ↓
+version.yml  →  "Version Packages" PR 생성/갱신   ← 여기서는 배포 안 함
+   ↓
+그 PR 머지 (버전 · CHANGELOG 갱신)
+   ↓
+사람이 git tag v0.1.0 && git push origin v0.1.0
+   ↓
+release.yml  →  빌드 → verify:dist --release → npm 배포 → GitHub Release
+```
+
+이 구조를 택한 이유가 있습니다. `changesets/action` 에 `publish` 입력을 주면 **changeset 이 하나도 없을 때 곧바로 발행을 시도합니다.** 설정 직후에는 changeset 이 0개이므로, main 에 푸시하는 순간 `0.0.0` 이 npm 에 올라갈 수 있습니다. npm 배포는 되돌릴 수 없습니다. 그래서 `version.yml` 에는 `publish` 를 주지 않고, 발행은 태그 워크플로가 전담합니다.
+
+#### 인증: Trusted Publishing (OIDC)
+
+`NPM_TOKEN` 장기 시크릿을 쓰지 않습니다. GitHub Actions 의 OIDC 토큰으로 발행하고 provenance(배포 출처 증명)까지 붙입니다.
+
+두 가지 전제가 있습니다.
+
+- **npm 11.5.1 이상** — Node 22 기본은 10.x 이므로 워크플로에서 `npm install -g npm@latest` 를 먼저 실행합니다
+- **`setup-node` 에 `registry-url` 을 주지 않을 것** — 주면 `.npmrc` 에 `_authToken` 이 더미값으로 채워지고, npm 은 토큰이 있으면 OIDC 를 시도하지 않아 404 가 납니다
+
+#### `changeset publish` 를 쓰지 않는 이유
+
+발행은 `scripts/publish-packages.mjs` 가 직접 합니다. OIDC + provenance 경로를 확실히 태우기 위해서입니다.
+
+다만 `npm publish` 는 `workspace:^` 프로토콜을 모릅니다. 그대로 발행하면 소비자가 설치할 수 없는 `package.json` 이 올라갑니다. 그래서 **`pnpm pack` 으로 프로토콜이 치환된 tarball 을 먼저 만들고, 그 tarball 을 `npm publish` 로 발행**합니다.
+
+스크립트가 하는 일:
+
+- 태그 버전과 모든 패키지 버전이 일치하는지 검사 (`--expect-version`)
+- 이미 발행된 버전은 건너뜀 (재실행 안전)
+- `pnpm pack` → `npm publish <tarball> --provenance --access public`
+
+`pnpm release:dry` 로 발행 직전까지 로컬에서 리허설할 수 있습니다.
+
+#### 이중 안전장치
+
+`verify-dist.mjs --release` 는 버전이 `0.0.0` 이면 배포를 거부합니다. 태그를 잘못 달거나 changeset 없이 배포 경로에 들어서는 것을 한 번 더 막습니다.
 
 ---
 

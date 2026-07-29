@@ -90,7 +90,7 @@ pnpm --filter @brick/tokens dev     # watch 모드
 pnpm changeset
 ```
 
-main에 머지되면 GitHub Actions가 "Version Packages" PR을 열고, 그 PR을 머지하면 npm에 배포됩니다. 자세한 내용은 [`.changeset/README.md`](./.changeset/README.md)에 있습니다.
+main에 머지되면 GitHub Actions가 "Version Packages" PR을 엽니다. 그 PR을 머지한 뒤 **`v0.1.0` 같은 태그를 푸시해야** npm에 배포됩니다 — main 푸시만으로는 배포되지 않습니다. 자세한 내용은 [`.changeset/README.md`](./.changeset/README.md)에 있습니다.
 
 ## 저장소 구조
 

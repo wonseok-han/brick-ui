@@ -77,3 +77,18 @@ TypeScript 7은 npm 패키지 `exports`에서 클래식 컴파일러 API를 제�
 - 한국어로 작성. `feat(scope):` / `chore:` / `fix:` 형태
 - 본문에는 **무엇을 했는지보다 왜 그렇게 했는지**를 씁니다. 특히 우회책은 원인과 증상을 남겨야 나중에 되돌리지 않습니다
 - 커밋과 푸시는 사용자가 요청할 때만 합니다
+
+## 배포
+
+**배포 트리거는 `v*` 태그 하나뿐입니다.** main 푸시로는 npm에 아무것도 올라가지 않습니다.
+
+- `version.yml`(main 푸시) → "Version Packages" PR 생성/갱신. **발행하지 않습니다**
+- `release.yml`(`v*` 태그) → 빌드 → `verify-dist --release` → npm 배포 → GitHub Release
+
+`changesets/action`에 `publish` 입력을 주지 마세요. changeset이 하나도 없으면 곧바로 발행을 시도해서, 설정 직후 main 푸시만으로 `0.0.0`이 npm에 올라갑니다. npm 배포는 되돌릴 수 없습니다.
+
+`NPM_TOKEN`은 쓰지 않습니다. Trusted Publishing(OIDC)이라 `setup-node`에 **`registry-url`을 주면 안 됩니다** — `.npmrc`에 더미 토큰이 채워져 OIDC 경로를 타지 않게 됩니다.
+
+발행은 `changeset publish`가 아니라 `scripts/publish-packages.mjs`가 합니다. `npm publish`가 `workspace:^`를 모르기 때문에, `pnpm pack`으로 프로토콜이 치환된 tarball을 만든 뒤 그것을 발행합니다.
+
+리허설: `pnpm release:dry`

@@ -15,6 +15,12 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
+/**
+ * `--release` 로 실행하면 배포 직전용 검사가 추가된다.
+ * CI 의 일반 검증에서는 0.0.0 이 정상이므로 이 검사를 켜지 않는다.
+ */
+const releaseMode = process.argv.includes("--release");
+
 /** @type {{ name: string, dir: string, checks: Check[] }[]} */
 const targets = [
   {
@@ -135,6 +141,23 @@ async function checkNoNodeModulesPaths(pkgDir) {
   return leaked.length > 0 ? `dist 에 node_modules 경로 누출: ${leaked.join(", ")}` : null;
 }
 
+/**
+ * 초기 버전 그대로 배포되는 것을 막는다.
+ *
+ * changesets/action 은 changeset 이 하나도 없으면 곧바로 publish 를 실행한다.
+ * 릴리스 워크플로를 켜둔 상태에서 changeset 없이 main 에 푸시하면 0.0.0 이
+ * npm 에 올라가고, npm 배포는 되돌릴 수 없다. 여기서 한 번 더 막는다.
+ */
+function checkVersionIsReleasable(pkgDir) {
+  if (!releaseMode) return null;
+
+  const { version } = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf8"));
+
+  return version === "0.0.0"
+    ? `버전이 0.0.0 이다. 배포하려면 먼저 changeset 을 만들어 버전을 올려야 한다`
+    : null;
+}
+
 /** package.json 의 exports 가 가리키는 파일이 실제로 존재하는지 확인한다. */
 function checkExportsResolve(pkgDir) {
   const pkg = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf8"));
@@ -168,7 +191,7 @@ for (const target of targets) {
     if (problem) problems.push(problem);
   }
 
-  for (const extra of [checkNoNodeModulesPaths, checkExportsResolve]) {
+  for (const extra of [checkNoNodeModulesPaths, checkExportsResolve, checkVersionIsReleasable]) {
     const problem = await extra(pkgDir);
     if (problem) problems.push(problem);
   }
