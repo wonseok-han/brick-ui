@@ -480,3 +480,33 @@ src/shared/ui/
 | 7    | `@brick/icons`, `apps/docs`              | —                                                        |
 
 > **5단계를 초반에 하지 않으면**, exports/sideEffects 문제를 컴포넌트 20개 만든 뒤에 발견하게 됩니다. 반드시 컴포넌트 1개 시점에 한 번 검증하세요.
+
+### 로컬 소비 검증 절차
+
+`pnpm pack` 으로 tarball 을 만들어 **모노레포 바깥**의 앱에 설치합니다. 워크스페이스 링크로는 `exports` 맵이 제대로 검증되지 않습니다.
+
+주의할 점 하나. `workspace:^` 는 `^0.0.0` 으로 치환되는데, 이 버전은 레지스트리에 없으므로 `@brick/core` 가 의존하는 `@brick/tokens` 해석이 404 로 실패합니다. 소비자 쪽에 override 를 걸어야 합니다.
+
+```yaml
+# 소비자 앱의 pnpm-workspace.yaml
+# (pnpm 11 은 package.json 의 pnpm.overrides 를 더 이상 읽지 않는다)
+overrides:
+  "@brick/tokens": "file:/path/to/brick-tokens-0.0.0.tgz"
+  "@brick/utils": "file:/path/to/brick-utils-0.0.0.tgz"
+```
+
+#### 5단계 실측 결과
+
+| 검증 항목                            | 결과                                                    |
+| ------------------------------------ | ------------------------------------------------------- |
+| `moduleResolution: bundler` 타입체크 | 통과                                                    |
+| `moduleResolution: node16` 타입체크  | 통과 — 확장자 없는 `.d.ts` 재수출도 문제없음            |
+| CJS `require()`                      | 통과 (`Text`, `sprinkles`, `vars`, `cx` 모두 해석)      |
+| 소비자 빌드 CSS                      | 13.69 kB, CSS 변수 71개, `[data-theme=dark]` 블록 포함  |
+| `node_modules` 경로 누출             | 0건                                                     |
+| JS 트리셰이킹                        | 동작 — `Text` 만 쓰면 sprinkles 런타임 11.8 kB 제외     |
+| **CSS 트리셰이킹**                   | **안 됨 — 단일 `styles.css` 라 유틸리티 전체가 따라옴** |
+
+CSS 가 트리셰이킹되지 않는 것은 단일 스타일시트 구조의 필연입니다. 현재 `Text` 하나만 써도 10.4 kB(gzip 1.7 kB)를 받습니다. 컴포넌트가 늘어도 유틸리티 계층은 고정이므로 증가폭은 완만하지만, 임계를 넘으면 컴포넌트별 CSS 분리나 `@layer` 분할을 검토해야 합니다.
+
+> 2단계에서 우려했던 `.d.ts` 확장자 문제는 실재하지 않았습니다. `contract.css.d.ts` 파일이 실제로 존재하므로 `from "./contract.css"` 가 `node16` 에서도 해석됩니다. 대신 예상 못 한 곳에서 걸렸습니다 — 소비자에게 번들러 앰비언트 타입(`vite/client` 등)이 없으면 `import "@brick/core/styles.css"` 자체가 TS2882 로 실패합니다.

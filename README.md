@@ -37,6 +37,8 @@ import "@brick/tokens/theme.css";
 import "@brick/core/styles.css";
 ```
 
+> CSS를 import하려면 프로젝트에 번들러의 앰비언트 타입이 있어야 합니다. Vite는 `src/vite-env.d.ts`의 `/// <reference types="vite/client" />`, Next.js는 `next-env.d.ts`가 이 역할을 합니다. 없으면 `TS2882: Cannot find module or type declarations for side-effect import` 이 납니다. 라이브러리 문제가 아니라 CSS를 배포하는 모든 패키지에 공통인 사항입니다.
+
 ```tsx
 import { Text } from "@brick/core";
 

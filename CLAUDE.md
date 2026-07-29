@@ -38,6 +38,8 @@ TypeScript 7은 npm 패키지 `exports`에서 클래식 컴파일러 API를 제�
 
 **빌드 성공을 통과 기준으로 삼지 마세요.** `dist`에 CSS가 실제로 있는지, 그 안에 기대한 변수/클래스가 들어 있는지 직접 확인해야 합니다.
 
+**`exports` 맵이나 패키지 의존성을 바꿨으면 `pnpm pack`으로 실제 소비를 검증하세요.** 워크스페이스 링크로는 `exports` 맵이 검증되지 않습니다. 절차는 `docs/architecture.md`의 "로컬 소비 검증 절차"에 있습니다. `workspace:^`가 `^0.0.0`으로 치환되어 레지스트리 404가 나므로 소비자 쪽 override가 필요합니다.
+
 **토큰의 이름과 값은 진입점을 분리합니다.** `index.ts`는 변수 이름만, `theme.ts`는 CSS만 내보냅니다. `index.ts`가 테마를 import하면 `@brick/core` 빌드에 토큰 테마 CSS가 중복으로 딸려 들어갑니다.
 
 **`tokens`가 먼저 빌드돼야 `core`가 참조할 변수명이 확정됩니다.** turbo의 `dependsOn: ["^build"]`가 이걸 보장합니다. 임의로 풀지 마세요.
