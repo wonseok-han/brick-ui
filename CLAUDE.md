@@ -54,6 +54,17 @@ TypeScript 7은 npm 패키지 `exports`에서 클래식 컴파일러 API를 제�
 ## 로컬 환경
 
 - **포트 3000~3006은 다른 프로젝트가 점유 중입니다.** `apps/docs`는 3100, `apps/storybook`은 6006을 씁니다
+- **컴포넌트를 눈으로 확인할 때는 Chrome 헤드리스로 Storybook iframe 을 직접 캡처하세요.** Claude 브라우저 확장은 Chrome 로그인 계정이 다르면 연결되지 않습니다. 설치 없이 되고 더 안정적입니다:
+
+  ```bash
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+    --headless --disable-gpu --screenshot=out.png --window-size=520,220 \
+    --virtual-time-budget=8000 \
+    "http://localhost:6006/iframe.html?viewMode=story&id=primitives-text--truncate"
+  ```
+
+  스토리 id 는 `curl -s localhost:6006/index.json` 으로 확인합니다. 다크 테마는 `&globals=theme:dark` 를 붙입니다
+
 - 셸에서 `_safe_eval: command not found` 가 뜨면 scm_breeze 충돌입니다. `/bin/ls`, `/usr/bin/git` 등 절대경로로 우회하세요. 명령 자체는 정상 동작합니다
 - 복합 명령에서 `cd`가 먹지 않는 경우가 있습니다. `pnpm --dir <path>` 나 절대경로를 쓰세요
 
