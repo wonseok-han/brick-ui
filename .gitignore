@@ -4,6 +4,7 @@ dist/
 storybook-static/
 .next/
 out/
+next-env.d.ts
 
 *.tsbuildinfo
 *.log
