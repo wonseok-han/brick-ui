@@ -18,7 +18,8 @@ import { preserveDirectives } from "rollup-plugin-preserve-directives";
  *
  * @param {object} options
  * @param {string} options.pkgDir 패키지 루트 절대경로 (보통 import.meta.dirname)
- * @param {string} [options.entry] 엔트리 파일. 기본값 "src/index.ts"
+ * @param {string | Record<string, string>} [options.entry] 엔트리. 여러 개면
+ *   `{ index: "src/index.ts", theme: "src/theme.ts" }` 형태로 준다. 기본값 "src/index.ts"
  * @param {string} [options.cssFileName] 산출 CSS 파일명(확장자 제외). 기본값 "styles"
  * @param {(string | RegExp)[]} [options.extraExternal] 추가로 external 처리할 모듈
  * @returns {import("vite").UserConfig}
@@ -60,7 +61,12 @@ export function createLibraryConfig({
       sourcemap: true,
       minify: false, // 라이브러리는 압축하지 않는다. 소비 측 번들러가 한다.
       lib: {
-        entry: resolve(pkgDir, entry),
+        entry:
+          typeof entry === "string"
+            ? resolve(pkgDir, entry)
+            : Object.fromEntries(
+                Object.entries(entry).map(([name, path]) => [name, resolve(pkgDir, path)]),
+              ),
         formats: ["es", "cjs"],
         cssFileName,
       },

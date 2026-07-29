@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@vanilla-extract/css':
+      specifier: ^1.21.2
+      version: 1.21.2
     '@vanilla-extract/vite-plugin':
       specifier: ^5.2.6
       version: 5.2.6
@@ -35,6 +38,24 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
+
+  packages/tokens:
+    devDependencies:
+      '@brick/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript-config
+      '@brick/vite-config':
+        specifier: workspace:*
+        version: link:../../tooling/vite-config
+      '@vanilla-extract/css':
+        specifier: 'catalog:'
+        version: 1.21.2
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: 8.1.5(@types/node@26.1.2)(esbuild@0.28.1)
 
   tooling/typescript-config: {}
 

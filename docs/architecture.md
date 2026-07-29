@@ -117,20 +117,33 @@ Vanilla Extract의 `createThemeContract` / `createGlobalTheme`로 **CSS 변수 �
 
 ```
 packages/tokens/src/
-├─ contract.css.ts       # createThemeContract — 변수 "이름"만 정의
+├─ primitives/
+│  ├─ palette.ts         # 원시 색상. 컴포넌트가 직접 쓰지 않는다
+│  └─ scale.ts           # space / radius / fontSize / lineHeight / shadow …
+├─ contract.css.ts       # createGlobalThemeContract — 변수 "이름"만 정의
 ├─ themes/
-│  ├─ light.css.ts       # createTheme(contract, {...})
-│  └─ dark.css.ts
-├─ primitives/           # 원시값: palette, spacing scale, radius, fontSize
-└─ index.ts
+│  ├─ values.ts          # ColorTokens 타입 + lightColors / darkColors
+│  ├─ base.css.ts        # 테마 무관 변수를 :root 에
+│  ├─ light.css.ts       # :root
+│  └─ dark.css.ts        # [data-theme="dark"]
+├─ index.ts              # 공개 API — CSS 를 만들지 않는다
+└─ theme.ts              # 부수효과 전용 엔트리 — CSS 를 만든다
 ```
 
 핵심은 **contract와 theme의 분리**입니다. `core`는 contract(변수 이름)만 참조하므로, 소비 프로젝트가 `createTheme`으로 자기 테마를 만들어 끼워도 컴포넌트 CSS는 그대로 동작합니다. SEED가 브랜드별 테마를 갈아끼우는 방식과 같습니다.
 
-빌드 산출물:
+**`index.ts`와 `theme.ts`를 분리한 이유**가 중요합니다. `index.ts`가 테마 파일을 import하면, `@brick/core`가 `.css.ts` 안에서 `vars`를 참조하는 순간 토큰 테마 CSS가 core의 스타일 번들에도 딸려 들어가 중복 출력됩니다. 이름(계약)과 값(테마)의 진입점은 끝까지 분리합니다.
 
-- `dist/index.js` — 변수명 문자열 (`--brick-color-fg-neutral` 같은)
-- `dist/theme.css` — 실제 값
+빌드 산출물 (실측):
+
+- `dist/index.js` — `var(--brick-color-fg-neutral)` 같은 문자열. CSS 참조 없음
+- `dist/theme.css` — 3.74 kB, CSS 변수 71개 (`:root` + `[data-theme="dark"]`)
+
+### 토큰 작성 시 걸리는 두 가지
+
+**CSS 변수 이름은 직접 지정합니다.** VE의 기본 동작은 해시 이름 생성인데, 그러면 소비 프로젝트가 순수 CSS로 토큰을 덮어쓸 수 없습니다. 디자인 시스템의 토큰 이름은 공개 API이므로 계약이어야 합니다. `createGlobalThemeContract`에 네이밍 함수를 넘기되, **path 세그먼트를 kebab-case로 변환**해야 합니다. 안 하면 `--brick-fontSize-xs`처럼 CSS 변수에 camelCase가 섞입니다.
+
+**`ColorTokens`는 `interface`가 아니라 `type`이어야 합니다.** VE의 `NullableTokens`는 인덱스 시그니처를 요구하는데, interface는 암묵적 인덱스 시그니처를 갖지 않아 `createGlobalThemeContract`에 넘길 수 없습니다. `type` 별칭은 됩니다.
 
 ### `@brick/utils` — 타입/런타임 헬퍼
 
@@ -273,7 +286,7 @@ pnpm catalog로 React/TS 버전을 한 곳에서 고정하면, 패키지가 10�
   "name": "@brick/core",
   "version": "0.0.0",
   "type": "module",
-  "sideEffects": ["**/*.css"],
+  "sideEffects": ["**/*.css", "**/*.css.ts"],
   "files": ["dist"],
   "exports": {
     ".": {
@@ -321,6 +334,12 @@ pnpm catalog로 React/TS 버전을 한 곳에서 고정하면, 패키지가 10�
 **② `sideEffects: ["**/*.css"]`**
 
 없으면 번들러가 CSS import를 죽여서 스타일이 통째로 사라집니다. **가장 흔한 사고 지점입니다.**
+
+`**/*.css.ts`가 왜 같이 필요한지는 실제로 당해봐야 압니다. Vite의 resolve 플러그인은 이 글롭을 **소비자뿐 아니라 자기 패키지 소스에도 적용**합니다. `**/*.css`만 적으면 `src/themes/light.css.ts`가 매치되지 않아 "부수효과 없는 모듈"로 판정되고, `import "./themes/light.css"` 같은 부수효과 전용 import가 트리셰이킹으로 제거됩니다.
+
+결과는 조용한 실패입니다 — 빌드는 성공하고, 산출 JS는 멀쩡하고, **CSS 파일만 생성되지 않습니다.** 에러도 경고도 없습니다. 2단계에서 `dist/theme.css`가 통째로 누락된 원인이 이것이었습니다.
+
+> 빌드 성공을 통과 기준으로 삼으면 안 됩니다. `dist` 안에 CSS가 실제로 있는지, 그 안에 기대한 변수가 들어 있는지까지 확인해야 합니다.
 
 **③ `workspace:^` vs `workspace:*`**
 

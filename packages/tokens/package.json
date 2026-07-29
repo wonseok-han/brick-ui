@@ -1,0 +1,39 @@
+{
+  "name": "@brick/tokens",
+  "version": "0.0.0",
+  "description": "brick-ui 디자인 토큰 및 테마 계약",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.css.ts"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./theme.css": "./dist/theme.css",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && pnpm run build:types",
+    "build:types": "tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@brick/typescript-config": "workspace:*",
+    "@brick/vite-config": "workspace:*",
+    "@vanilla-extract/css": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

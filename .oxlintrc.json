@@ -35,6 +35,12 @@
       "rules": {
         "import/no-default-export": "off"
       }
+    },
+    {
+      "files": ["**/src/theme.ts", "**/src/styles.ts"],
+      "rules": {
+        "import/no-unassigned-import": "off"
+      }
     }
   ]
 }
